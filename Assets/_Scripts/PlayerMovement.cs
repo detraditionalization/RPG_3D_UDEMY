@@ -9,19 +9,21 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField]
     float walkMoveStopRadius = 0.2f;
+    [SerializeField]
+    float attackMoveStopRadius = 5f;
 
     ThirdPersonCharacter m_Character;   // A reference to the ThirdPersonCharacter on the object
     CameraRaycaster cameraRaycaster;
-    Vector3 currentClickTarget;
+    Vector3 currentDestination;
         
     bool isIndirectMode = false;
-
+    private Vector3 clickPoint;
 
     private void Start()
     {
         cameraRaycaster = Camera.main.GetComponent<CameraRaycaster>();
         m_Character = GetComponent<ThirdPersonCharacter>();
-        currentClickTarget = transform.position;
+        currentDestination = transform.position;
     }
 
     // Fixed update is called in sync with physics
@@ -31,7 +33,7 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.G)) // TODO G for gamepad  allow player to map later
         {
             isIndirectMode = !isIndirectMode;
-            currentClickTarget = transform.position;
+            currentDestination = transform.position;
         }
 
         if (isIndirectMode)
@@ -61,14 +63,16 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
-
+            clickPoint = cameraRaycaster.hit.point;
             switch (cameraRaycaster.currentLayerHit)
             {
                 case Layer.Walkable:
-                    currentClickTarget = cameraRaycaster.hit.point;
-                    m_Character.Move(currentClickTarget - transform.position, false, false);
+                    currentDestination = ShortDestination(clickPoint, walkMoveStopRadius);
+
                     break;
-                case Layer.Enemy:                    
+                case Layer.Enemy:
+                    currentDestination = ShortDestination(clickPoint, attackMoveStopRadius);
+
                     break;
                 case Layer.RaycastEndStop:
                     break;
@@ -77,15 +81,37 @@ public class PlayerMovement : MonoBehaviour
                     break;
             }
         }
-        var playerToClickPoint = currentClickTarget - transform.position;
-        if (playerToClickPoint.sqrMagnitude >= walkMoveStopRadius)
+
+        WalkToDestination();
+
+    }
+
+    private void WalkToDestination()
+    {
+        var playerToClickPoint = currentDestination - transform.position;
+        if (playerToClickPoint.magnitude >= 0)
         {
-            m_Character.Move(currentClickTarget - transform.position, false, false);
+            m_Character.Move(currentDestination - transform.position, false, false);
         }
         else
         {
             m_Character.Move(Vector3.zero, false, false);
         }
+    }
+
+    Vector3 ShortDestination(Vector3 dest, float shortening)
+    {
+        Vector3 reductionVect = (dest - transform.position).normalized * shortening;
+        return dest - reductionVect;
+    }
+
+    private void OnDrawGizmos()
+    {
+        // visualize walk target
+        Gizmos.color = Color.black;
+        Gizmos.DrawLine(transform.position, currentDestination);
+        Gizmos.DrawSphere(currentDestination, 0.05f);
+        Gizmos.DrawSphere(clickPoint, 0.1f);
     }
 }
 
