@@ -89,7 +89,7 @@ public class PlayerMovement : MonoBehaviour
     private void WalkToDestination()
     {
         var playerToClickPoint = currentDestination - transform.position;
-        if (playerToClickPoint.magnitude >= 0)
+        if (playerToClickPoint.magnitude >= 0.1f)
         {
             m_Character.Move(currentDestination - transform.position, false, false);
         }
