@@ -32,7 +32,6 @@ public class CursorAffordance : MonoBehaviour {
     private void OnDisable()
     {
         cr.OnLayerChange -= HandleOnLayerChange;
-
     }
 
     private void HandleOnLayerChange(Layer layer)
