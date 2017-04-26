@@ -16,4 +16,6 @@ public class Enemy : MonoBehaviour {
             return currentHealth / maxHealth;
         }
     }
+
+
 }
