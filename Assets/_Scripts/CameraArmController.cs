@@ -10,6 +10,8 @@ public class CameraArmController : MonoBehaviour {
     [Range(0.01f,1f)]
     public float Sensitivity;
 
+    
+
     private void Update()
     {
         CheckCameraTurn();
@@ -17,12 +19,12 @@ public class CameraArmController : MonoBehaviour {
 
     private void CheckCameraTurn()
     {
-        if (Input.GetMouseButtonDown(2))
+        if (Input.GetMouseButtonDown(1))
         {
             _lastMouseX = Input.mousePosition.x;
         }
 
-        if (Input.GetMouseButton(2))
+        if (Input.GetMouseButton(1))
         {
             TurnCameraArm((Input.mousePosition.x - _lastMouseX)*Sensitivity);
             _lastMouseX = Input.mousePosition.x;
